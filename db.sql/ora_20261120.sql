@@ -255,4 +255,175 @@ where substr(to_char(hire_date, 'yyyy'),0,2) = '20';
 select trunc(sysdate,'year') from dual;
 
 --kor 40점대 ,60점 대, 80점 대에 있는 사람을 출력하시오.
-select * from stuscore;
+select * from stuscore
+where (kor>=40 and kor<=49)
+or (kor>=60 and kor<=69)
+or (kor>=80 and kor<=89)
+;
+
+select kor,trunc(kor,-1) from stuscore
+where trunc(kor,-1)=40 or trunc(kor,-1)=60 or trunc(kor,-1)=80
+;
+
+select kor from stuscore
+where trunc(kor,-1) in (40,60,80)
+order by kor desc;
+
+-- 시간
+select bdate,to_char(bdate,'yyyy-mm-dd hh:mi:ss day') from board3;
+select bdate,to_char(bdate,'yyyy-mm-dd hh24') from board3;
+
+-- 날짜 타입 -> 문자타입/ 날자 형태를 변경해서 출력
+-- 숫자타입 -> 문자타입
+-- 자리수 : '999,999,999,999' 자리가 있으면 자리 출력, 없으면 빈공백
+-- '000,000,000,000' 있으면 자리출력, 없으면 0으로 채워줌.
+-- L : 원화표시, 영문버전 $ , 일본어버전 엔화표시
+-- .00 : 소수점 표시
+select * from kor_loan_status;
+select to_char(salary*1425*12*10,'$009,999,999,999') as ysalary from employees;
+
+-- loan_jan_amt *10000000천만단위임.
+-- 천만원을 곱해서 자리수를 표시하시오.
+select * from kor_loan_status;
+select to_char(loan_jan_amt*10000000,'L999,999,999,999,999') from kor_loan_status;
+
+-- number -> to_char()
+-- 날짜 문자로 변환 : 형태를 변경
+-- 숫자 문자로 변환 : 천단위, 원화 표시
+-- 숫자 날짜로 변환
+select to_date(20261120,'yyyymmdd') from dual;
+select to_date('20261120','yyyymmdd') from dual;
+
+select * from gallerylist;
+--galphotographymonth 날짜타입으로 변경하시오.
+select galphotographymonth from gallerylist;
+select to_date(galphotographymonth,'yyyymm') from gallerylist;
+
+update gallerylist set galphotographymonth=to_date(galphotographymonth,'yyyymm');
+
+commit;
+
+alter table gallerylist
+modify GALPHOTOGRAPHYMONTH date;
+
+alter table gallerylist
+add ( GALPHOTOGRAPHYMONTH2 date);
+
+select GALPHOTOGRAPHYMONTH,GALPHOTOGRAPHYMONTH2 from gallerylist;
+
+desc gallerylist;
+
+
+update gallerylist set galphotographymonth2
+= to_date(galphotographymonth,'yyyy-mm-dd');
+
+--컬럼삭제
+alter table gallerylist
+drop column galphotographymonth;
+
+-- 컬럼추가
+alter table gallerylist
+add (galphotographymonth2 date);
+
+-- 컬럼이름 변경
+alter table gallerylist
+rename column galphotographymonth2 to galphotographymonth;
+
+-- 컬럼 순서 변경
+alter table gallerylist modify GALPHOTOGRAPHER invisible;
+alter table gallerylist modify GALSEARCHKEYWORD invisible;
+alter table gallerylist modify GALPHOTOGRAPHER visible;
+alter table gallerylist modify GALSEARCHKEYWORD visible;
+
+desc gallerylist;
+
+--galphotographymonth :varchar타입
+-- -> 날짜타이븡로 변경하려니 데이터가 변경하려는타입과 형태가 다름.
+
+drop table gallerylist;
+
+create table gallerylist (
+    gno number(12) primary key,
+    galContentId varchar2(8) not null,
+    galContentTypeId varchar2(10),
+    galTitle varchar2(100),
+    galWebImageUrl varchar2(100),
+    galCreatedtime varchar2(100),
+    galModifiedtime varchar2(100),
+    galPhotographyMonth varchar2(10),
+    galPhotographyLocation varchar2(100),
+    galPhotographer varchar2(100),
+    galSearchKeyword varchar2(1000)
+);
+
+select to_date(galPhotographyMonth,'yyyy-mm') from gallerylist;
+
+update gallerylist set
+galPhotographyMonth = to_date(galPhotographyMonth,'yyyy-mm');
+
+commit;
+
+
+
+-- date 타입변경
+-- galPhotographyMonth2를 새로 만들고 ,galPhotographyMonth을 삭제 후 ,galPhotographyMonth2를 galPhotographyMonth로 변경
+
+-- galPhotographyMonth : varchar2 타입상태
+select galPhotographyMonth from gallerylist;
+
+
+--alter table gallerylist
+--modify (galPhotographyMonth date);
+
+-- galPhotographyMonth2 date타입으로 추가
+alter table gallerylist
+add (galPhotographyMonth2 date);
+
+-- galPhotographyMonth2 : date타입
+-- galPhotographyMonth 의 모든 행 복사
+update gallerylist
+set galPhotographyMonth2 = galPhotographyMonth;
+
+--galPhotographyMonth 삭제
+alter table gallerylist
+drop column galPhotographyMonth;
+
+--galPhotographyMonth2 를 galPhotographyMonth로 이름변경
+alter table gallerylist
+rename column galPhotographyMonth2 to galPhotographyMonth;
+
+
+desc gallerylist;
+
+
+-- 날짜타입으로 변경하시오.
+select to_date(galcreatedtime,'yyyymmddhh24miss') from gallerylist;
+-- 컬럼추가
+alter table gallerylist
+add (galcreatedtime2 date);
+-- 컬럼안에 데이터 복사
+update gallerylist
+set galcreatedtime2 = to_date(galcreatedtime,'yyyymmddhh24miss');
+-- 기존컬럼 삭제
+alter table gallerylist
+drop column galcreatedtime;
+-- 컬럼이름 변경
+alter table gallerylist
+rename column galcreatedtime2 to galcreatedtime;
+--컬럼 순서 변경
+-- invisible: 숨김 
+alter table gallerylist modify GALMODIFIEDTIME invisible;
+alter table gallerylist modify GALPHOTOGRAPHYLOCATION  invisible;
+alter table gallerylist modify GALPHOTOGRAPHER invisible;
+alter table gallerylist modify GALSEARCHKEYWORD invisible;
+-- visible : 다시 보이기
+alter table gallerylist modify GALMODIFIEDTIME visible;
+alter table gallerylist modify GALPHOTOGRAPHYLOCATION  visible;
+alter table gallerylist modify GALPHOTOGRAPHER visible;
+alter table gallerylist modify GALSEARCHKEYWORD visible;
+-- 컬럼 타입 확인
+desc gallerylist;
+-- 저장
+commit;
+
+select '20261120',sysdate-to_date('20260101') from dual;
