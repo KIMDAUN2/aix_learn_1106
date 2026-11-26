@@ -263,3 +263,15 @@ select * from stuscore2;
 insert into stuscore2 values (2,'홍길동','디지털고',190,90,90,90,270,90,'python','');
 
 rollback;
+
+
+update stuscore2 set height=180,specialty='c'
+where no !=1;
+
+rollback;
+
+select * from kor_loan_status;
+
+select region,sum(loan_jan_amt) from kor_loan_status
+where gubun = '주택담보대출'
+group by region;
